@@ -1,12 +1,13 @@
 #include "tp1.h"
 #include <stdlib.h>
 
+
 /*
  * Determina si un número es primo.
  */
 bool is_prime(int x){
     for(size_t i=2;i<x;i++){
-        if(i%x==0){
+        if(x%i==0){
             return false;
         }
     }
@@ -18,7 +19,9 @@ bool is_prime(int x){
  * la función calcula cuantos productos entran en el depósito.
  */
 int storage_capacity(float d, float v){
-    return 1;
+    int s;
+    s=d/v;
+    return s;
 }
 
 /*
