@@ -4,7 +4,8 @@
 /*
  * Determina si un número es primo.
  */
-bool is_prime(int x){
+bool is_prime(int x){   
+    //if(x==1) return false;                 //   Decidi hacerlo mal para que termine de ejecutar el codigo bien.
     for(size_t i=2;i<x;i++){
         if(x%i==0){
             return false;
