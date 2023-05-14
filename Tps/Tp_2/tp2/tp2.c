@@ -156,7 +156,7 @@ void *list_pop_tail(list_t *list){
     return auxv;
 }
 
-void list_destroy(list_t *list, void destroy_value(void *)){  //verificar
+void list_destroy(list_t *list, void destroy_value(void *)){
     if(destroy_value){
         while(!list_is_empty(list)){
             destroy_value(list_pop_tail(list));
@@ -324,10 +324,10 @@ void *list_iter_delete(list_iter_t *iter){
     auxv=aux->value;
 
     if(aux==iter->list->head){
-        list_iter_forward(iter);  //hay que aclarar
+        list_iter_forward(iter);  
         list_pop_head(iter->list);
     } else if(aux==iter->list->tail){
-        list_iter_backward(iter);  //hay que aclarar
+        list_iter_backward(iter);  
         list_pop_tail(iter->list);
     } else{
         iter->curr->prev->next=aux->next;
