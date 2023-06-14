@@ -6,11 +6,6 @@
 
 #define INIT 20       //TAMAÑO INICIAL DEL DICCIONARIO
 
-/*
-char SortedArray[10];
-bool isShort;
-char* long_str;
-*/
 
 //estructura de una lista simplemente enlazada
 typedef struct node {
@@ -72,12 +67,6 @@ void* removerPrincipio(Lista* lista){
       Node* cabeza_vieja = lista->head;
       lista->head=cabeza_vieja->next;
       void* valor=cabeza_vieja->value;
-      // if(fdestroy != NULL){
-      //   fdestroy(cabeza_vieja->value);
-      // }
-      // if(s==true){
-      //   free(cabeza_vieja->value);
-      // }
       free(cabeza_vieja->key);
       free(cabeza_vieja);
       lista->size--;
@@ -158,26 +147,21 @@ size_t hash_function(const char *key, size_t capacity) {
 
 
 dictionary_t* re_hash(dictionary_t* dictionary, size_t capacity) {
-  // Crear una nueva tabla de listas sin inicializar todo el diccionario
   Lista* nuevasListas = (Lista*)malloc(sizeof(Lista) * capacity);
   if (nuevasListas == NULL) {
     return NULL;
   }
 
-  // Inicializar la nueva tabla de listas
   for (size_t i = 0; i < capacity; i++) {
     nuevasListas[i].head = NULL;
     nuevasListas[i].size = 0;
   }
 
-  // Rehashing de los nodos existentes en el nuevo diccionario
   for (size_t i = 0; i < dictionary->capacity; i++) {
     Node* nodo = dictionary->listas[i].head;
     while (nodo != NULL) {
       size_t index = hash_function(nodo->key, capacity);
       Node* siguiente = nodo->next;
-
-      // Insertar el nodo en la nueva lista
       nodo->next = nuevasListas[index].head;
       nuevasListas[index].head = nodo;
       nuevasListas[index].size++;
@@ -186,7 +170,6 @@ dictionary_t* re_hash(dictionary_t* dictionary, size_t capacity) {
     }
   }
 
-  // Liberar la memoria de las listas y nodos del diccionario anterior
   for (size_t i = 0; i < dictionary->capacity; i++) {
     Node* nodo = dictionary->listas[i].head;
     while (nodo != NULL) {
@@ -200,7 +183,6 @@ dictionary_t* re_hash(dictionary_t* dictionary, size_t capacity) {
     }
   }
 
-  // Actualizar la información del diccionario
   free(dictionary->listas);
   dictionary->listas = nuevasListas;
   dictionary->capacity = capacity;
@@ -230,7 +212,7 @@ bool dictionary_put(dictionary_t *dictionary, const char *key, void *value) {
     return true;
   }else{
     Node* nodo=dictionary->listas[index].head;
-    while(nodo!=NULL){                              //caso que tenga misma key
+    while(nodo!=NULL){                              
       if(strcmp(nodo->key,key)==0){
         if(dictionary->destroy!=NULL){
           dictionary->destroy(nodo->value);
@@ -330,11 +312,6 @@ void *dictionary_pop(dictionary_t *dictionary, const char *key, bool *err) {
   }
   Node* nodo_sig = nodo->next;
   
-  // if (strcmp(nodo->key, key) != 0 && nodo->next == NULL) {
-  //   *err = true;
-  //   return NULL;
-  // } 
-  // else {
     while (nodo_sig != NULL) {
       if (strcmp(nodo_sig->key, key) == 0) {
         dictionary->size--;
@@ -378,7 +355,7 @@ void dictionary_destroy(dictionary_t *dictionary){
     Node *nodo = dictionary->listas[i].head;
     while (nodo != NULL) {
       Node *siguiente = nodo->next;
-      free(nodo->key);  // Liberar memoria asignada para la clave
+      free(nodo->key);  
       if (dictionary->destroy != NULL) {
         dictionary->destroy(nodo->value);
       }

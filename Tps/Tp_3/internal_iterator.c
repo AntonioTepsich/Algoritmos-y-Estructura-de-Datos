@@ -1,9 +1,26 @@
 #include "internal_iterator.h"
-#include "tp3.c"
 
 /*
  * Punto extra de internal iterator, suma 1 punto como máximo.
  */
+typedef struct node {
+  char *key;
+  void *value;
+  struct node *next;
+} Node;
+
+typedef struct lista {
+  Node *head;
+  size_t size;
+} Lista;
+
+
+struct dictionary {
+  Lista *listas;
+  size_t size;
+  size_t capacity;
+  destroy_f destroy;
+};
 
 
 /*

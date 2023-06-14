@@ -1,7 +1,6 @@
 #include <stdbool.h>
 #include "operable_dict.h"
-#include "tp3.c"
-
+// #include "tp3.c"
 /*
  * Punto extra de operable dict, suma 3 puntos como máximo.
  */
@@ -15,17 +14,17 @@
  * Devuelve true si funcionó, false si fayó.
  */
 bool dictionary_update(dictionary_t *dictionary1, dictionary_t *dictionary2){
-    dictionary_t *dicAux=dictionary1;
-    for(size_t i=0;i<dictionary2->capacity;i++){
-        Node* nodo=dictionary2->listas[i].head;
-        while(nodo!=NULL){
-                if(dictionary_put(dictionary1,nodo->key,nodo->value)){
-                    dictionary1=dicAux;
-                    return false;
-                }
-            nodo=nodo->next;
-        }
-    }
+    // dictionary_t *dicAux=dictionary1;
+    // for(size_t i=0;i<dictionary2->capacity;i++){
+    //     Node* nodo=dictionary2->listas[i].head;
+    //     while(nodo!=NULL){
+    //             if(dictionary_put(dictionary1,nodo->key,nodo->value)){
+    //                 dictionary1=dicAux;
+    //                 return false;
+    //             }
+    //         nodo=nodo->next;
+    //     }
+    // }
     return true;
 }
 
@@ -35,23 +34,24 @@ bool dictionary_update(dictionary_t *dictionary1, dictionary_t *dictionary2){
  * Devuelve NULL si falla.
  */
 dictionary_t* dictionary_and(dictionary_t *dictionary1, dictionary_t *dictionary2){
-    dictionary_t *dictionary3=dictionary_create(dictionary1->destroy);
-    if(dictionary3==NULL){
-      return NULL;
-    }
+    // dictionary_t *dictionary3=dictionary_create(dictionary1->destroy);
+    // if(dictionary3==NULL){
+    //   return NULL;
+    // }
 
-    for(size_t i=0;i<dictionary1->capacity;i++){
-      Node* nodo=dictionary1->listas[i].head;
-      while(nodo!=NULL){
-        if(dictionary_contains(dictionary2,nodo->key)){
-          if(dictionary_put(dictionary3,nodo->key,nodo->value)){
-            return NULL;
-          }
-        }
-        nodo=nodo->next;
-      }
-    }
-    return dictionary3;
+    // for(size_t i=0;i<dictionary1->capacity;i++){
+    //   Node* nodo=dictionary1->listas[i].head;
+    //   while(nodo!=NULL){
+    //     if(dictionary_contains(dictionary2,nodo->key)){
+    //       if(dictionary_put(dictionary3,nodo->key,nodo->value)){
+    //         return NULL;
+    //       }
+    //     }
+    //     nodo=nodo->next;
+    //   }
+    // }
+    // return dictionary3;
+    return NULL;
 }
 
 /*
@@ -60,30 +60,31 @@ dictionary_t* dictionary_and(dictionary_t *dictionary1, dictionary_t *dictionary
  * Devuelve NULL si falla.
  */
 dictionary_t* dictionary_or(dictionary_t *dictionary1, dictionary_t *dictionary2){
-    dictionary_t *dictionary3=dictionary_create(dictionary1->destroy);
-    if(dictionary3==NULL){
-      return NULL;
-    }
+    // dictionary_t *dictionary3=dictionary_create(dictionary1->destroy);
+    // if(dictionary3==NULL){
+    //   return NULL;
+    // }
 
-    for(size_t i=0;i<dictionary2->capacity;i++){
-      Node* nodo=dictionary2->listas[i].head;
-      while(nodo!=NULL){
-        if(dictionary_put(dictionary3,nodo->key,nodo->value)){
-          return NULL;
-        }
-        nodo=nodo->next;
-      }
-    }
-    for(size_t i=0;i<dictionary1->capacity;i++){
-      Node* nodo=dictionary1->listas[i].head;
-      while(nodo!=NULL){
-        if(dictionary_put(dictionary3,nodo->key,nodo->value)){
-          return NULL;
-        }
-        nodo=nodo->next;
-      }
-    }
-    return dictionary3;
+    // for(size_t i=0;i<dictionary2->capacity;i++){
+    //   Node* nodo=dictionary2->listas[i].head;
+    //   while(nodo!=NULL){
+    //     if(dictionary_put(dictionary3,nodo->key,nodo->value)){
+    //       return NULL;
+    //     }
+    //     nodo=nodo->next;
+    //   }
+    // }
+    // for(size_t i=0;i<dictionary1->capacity;i++){
+    //   Node* nodo=dictionary1->listas[i].head;
+    //   while(nodo!=NULL){
+    //     if(dictionary_put(dictionary3,nodo->key,nodo->value)){
+    //       return NULL;
+    //     }
+    //     nodo=nodo->next;
+    //   }
+    // }
+    // return dictionary3;
+    return NULL;
 }
 
 /*
@@ -93,25 +94,26 @@ dictionary_t* dictionary_or(dictionary_t *dictionary1, dictionary_t *dictionary2
  *  - Tienen la misma cantidad de claves
  */
 bool dictionary_equals(dictionary_t *dictionary1, dictionary_t *dictionary2){
-    if(dictionary1->size!=dictionary2->size){
-      return false;
-    }
-    for(size_t i=0;i<dictionary1->capacity;i++){
-      Node* nodo=dictionary1->listas[i].head;
-      while(nodo!=NULL){
-        if(!dictionary_contains(dictionary2,nodo->key)){
-          return false;
-        }
-        bool err=true;
-        void *value2=dictionary_get(dictionary2,nodo->key,&err);
-        if(err){
-          return false;
-        }
-        if(value2!=nodo->value){
-          return false;
-        }
-        nodo=nodo->next;
-      }
-    }
+    // if(dictionary1->size!=dictionary2->size){
+    //   return false;
+    // }
+    // for(size_t i=0;i<dictionary1->capacity;i++){
+    //   Node* nodo=dictionary1->listas[i].head;
+    //   while(nodo!=NULL){
+    //     if(!dictionary_contains(dictionary2,nodo->key)){
+    //       return false;
+    //     }
+    //     bool err=true;
+    //     void *value2=dictionary_get(dictionary2,nodo->key,&err);
+    //     if(err){
+    //       return false;
+    //     }
+    //     if(value2!=nodo->value){
+    //       return false;
+    //     }
+    //     nodo=nodo->next;
+    //   }
+    // }
     return true;
+    
 }
