@@ -7,6 +7,7 @@ import heapq
 
 import time
 from tqdm import tqdm
+import random
 
 
 MOVIE_TITLE_TYPE = "movie"
@@ -105,19 +106,16 @@ def punto1():
     # Ordenar componentes de mayor a menor tamaño
     componentes_ordenadas = sorted(componentes_conexas, key=len, reverse=True)
 
-    # Segunda componente conexa más grande
     segunda_componente_grande = componentes_ordenadas[1] if len(componentes_ordenadas) >= 2 else []
     print("Segunda componente conexa más grande:", len(segunda_componente_grande))
 
-    # Componente más pequeña
     componente_mas_pequena = min(componentes_conexas, key=len) if componentes_conexas else []
     print("Componente más pequeña:", len(componente_mas_pequena))
 
-# punto1()
 
 def dijkstra(grafo, artista_inicial):
     if not grafo.vertex_exists(artista_inicial):
-        return None, None  # El artista inicial no existe en el grafo
+        return None, None  # Si el artista inicial no existe en el grafo
     
     distancias = {artista: float('inf') for artista, data in grafo._graph.items()}
     distancias[artista_inicial] = 0
@@ -153,51 +151,7 @@ def dijkstra(grafo, artista_inicial):
     
     return distancias, padres
 
-def calcular_camino_minimo(graph, actor1, actor2):
-    if not graph.vertex_exists(actor1) or not graph.vertex_exists(actor2):
-        return None
 
-    if actor1 == actor2:
-        return []
-
-    visited = set()
-    distances = {vertex: float('inf') for vertex in graph.get_vertices()}
-    distances[actor1] = 0
-    previous = {vertex: None for vertex in graph.get_vertices()}
-
-    queue = [(0, actor1)]
-
-    while queue:
-        current_distance, current_vertex = heapq.heappop(queue)
-
-        if current_vertex == actor2:
-            # Reconstruir el camino mínimo
-            path = []
-            while current_vertex is not None:
-                path.append(current_vertex)
-                current_vertex = previous[current_vertex]
-            return list(reversed(path))
-
-        if current_vertex in visited:
-            continue
-
-        visited.add(current_vertex)
-
-        neighbors = graph.get_neighbors(current_vertex)
-        for neighbor in neighbors:
-            edge_data = graph.get_edge_data(current_vertex, neighbor)
-            weight = len(edge_data)
-            distance = current_distance + weight
-
-            if distance < distances[neighbor]:
-                distances[neighbor] = distance
-                previous[neighbor] = current_vertex
-                heapq.heappush(queue, (distance, neighbor))
-
-    # No se encontró un camino entre los artistas
-    return None
-
-#Puede estar mal
 def punto4():
     distancias, padres = dijkstra(graph, "nm0000138") # Kevin Bacon
     print("Distancia de Kevin Bacon a Kevin Bacon:", distancias["nm0000138"]) # Kevin Bacon
@@ -207,13 +161,6 @@ def punto4():
     print("Distancia de Kevin Bacon a Leonardo DiCaprio:", distancias["nm0000138"]) # Leonardo DiCaprio
     print("Distancia de Kevin Bacon a Johnny Depp:", distancias["nm0000136"]) # Johnny Depp
 
-# punto4() 
-
-def punto4Aux():
-    resultado=calcular_camino_minimo(graph, "nm0000138", "nm0000129") # Kevin Bacon y Tom Cruise
-    
-    print("Camino mínimo entre Kevin Bacon y Tom Cruise:", resultado)
-# punto4Aux() 
 
 def shortest_path(graph, start):
     distances = {vertex: float('inf') for vertex in graph.get_vertices()}
@@ -242,46 +189,35 @@ def shortest_path(graph, start):
 def calculate_shortest_paths(graph):
     all_shortest_paths = {}
 
-    start_time = time.time()
 
-    # Inicializar el tqdm
-    progress_bar = tqdm(total=len(graph.get_vertices()))
-
-    for vertex in graph.get_vertices():
+    for vertex in tqdm(graph.get_vertices()):
         shortest_paths = shortest_path(graph, vertex)
         all_shortest_paths[vertex] = shortest_paths
 
-        # Actualizar el progreso
-        progress_bar.update()
 
-    # Cerrar el tqdm
-    progress_bar.close()
-
-    end_time = time.time()
-
-    return all_shortest_paths, end_time - start_time
+    return all_shortest_paths
 
 # REVISAR
 def punto5():
     all_shortest_paths,time = calculate_shortest_paths(graph)
-    print("Tiempo de ejecución:", time)
-    actor1 = "nm0000138" # Kevin Bacon
-    actor2 = "nm0000129" # Tom Cruise
+# # Si anduviera, debería mostrar el tiempo de ejecución y un ejemplo de llamado
+    # print("Tiempo de ejecución:", time)
+    # actor1 = "nm0000138" # Kevin Bacon
+    # actor2 = "nm0000129" # Tom Cruise
     # print("Camino mínimo entre Kevin Bacon y Tom Cruise:", all_shortest_paths[actor1][actor2])
-punto5()
+
 
 # REVISAR
 def estimate_diameter(graph, time_limit):
     diameter = 0
 
-    # Realizar un BFS desde cada vértice para encontrar la distancia máxima
-    # Utilizar un tiempo límite para interrumpir el proceso si se excede el límite
-    for vertex in tqdm(graph._graph.keys()):  # Recorrer los vértices del grafo
+    # Realiza un BFS desde cada vertice para encontrar la distancia maxima
+    for vertex in tqdm(graph._graph.keys()): 
         visited = set()
         distance = 0
         queue = deque([(vertex, distance)])
 
-        start_time = time.time()  # Guardar el tiempo de inicio
+        start_time = time.time() 
 
         while queue and time.time() - start_time < time_limit:
             curr_vertex, curr_distance = queue.popleft()
@@ -290,7 +226,7 @@ def estimate_diameter(graph, time_limit):
                 visited.add(curr_vertex)
                 distance = curr_distance
 
-                # Agregar los vecinos no visitados a la cola
+                # Agrega los vecinos no visitados a la cola
                 neighbors = graph.get_neighbors(curr_vertex)
                 for neighbor in neighbors:
                     if neighbor not in visited:
@@ -304,4 +240,168 @@ def punto6():
     diameter = estimate_diameter(graph, 900)
     print("Diámetro estimado del grafo:", diameter)
 
-# punto6()
+
+def get_connected_component(graph):
+    visited = set()
+    component = []
+
+    queue = deque()
+
+    # Encuentra un vertice inicial para comenzar el recorrido BFS
+    initial_vertex = next(iter(graph._graph.keys()))
+
+    queue.append(initial_vertex)
+    visited.add(initial_vertex)
+
+    while queue:
+        vertex = queue.popleft()
+        component.append(vertex)
+
+        neighbors = graph.get_neighbors(vertex)
+        for neighbor in neighbors:
+            if neighbor not in visited:
+                queue.append(neighbor)
+                visited.add(neighbor)
+
+    return component
+
+
+def bfs(graph, start):
+    distances = {vertex: float('inf') for vertex in graph._graph.keys()}
+    distances[start] = 0
+
+    queue = deque()
+    queue.append(start)
+
+    while queue:
+        current_vertex = queue.popleft()
+
+        for neighbor in graph.get_neighbors(current_vertex):
+            if distances[neighbor] == float('inf'):
+                distances[neighbor] = distances[current_vertex] + 1
+                queue.append(neighbor)
+
+    return distances
+
+def calculate_average_separations(graph, sample_size=100):
+    component = get_connected_component(graph)
+    actors = random.sample(component, sample_size)
+    total_separations = 0
+
+    for actor in tqdm(actors):
+        shortest_paths = shortest_path(graph, actor)
+        separations = sum(shortest_paths.values())
+        total_separations += separations
+
+    average_separations = total_separations / sample_size
+    estimated_average_separations = average_separations * (len(component) / sample_size)
+
+    return estimated_average_separations
+
+def punto7():
+    average_separations = calculate_average_separations(graph,100)
+    print("Promedio general de separaciones:")
+    print(average_separations)
+
+
+def calculate_betweenness_centrality(graph):
+    betweenness = {actor: 0 for actor in graph.get_vertices()}
+
+    for actor in tqdm(graph.get_vertices()):
+        visited = set()
+        stack = deque()
+        distance = {v: -1 for v in graph.get_vertices()}
+        paths = {v: [] for v in graph.get_vertices()}
+        sigma = {v: 0 for v in graph.get_vertices()}
+        sigma[actor] = 1
+        distance[actor] = 0
+        queue = deque([actor])
+
+        while queue:
+            v = queue.popleft()
+            stack.append(v)
+            visited.add(v)
+
+            for neighbor in graph.get_neighbors(v):
+                if distance[neighbor] == -1:
+                    queue.append(neighbor)
+                    distance[neighbor] = distance[v] + 1
+
+                if distance[neighbor] == distance[v] + 1:
+                    sigma[neighbor] += sigma[v]
+                    paths[neighbor].append(v)
+
+        delta = {v: 0 for v in graph.get_vertices()}
+        while stack:
+            v = stack.pop()
+            for neighbor in paths[v]:
+                delta[neighbor] += (sigma[neighbor] / sigma[v]) * (1 + delta[v])
+            if v != actor:
+                betweenness[v] += delta[v]
+
+    sorted_centrality = sorted(betweenness.items(), key=lambda x: x[1], reverse=True)
+    return sorted_centrality
+
+def punto9():
+    betweenness = calculate_betweenness_centrality(graph)
+
+    top_actors = betweenness[:10]  # los 10 actores principales
+    for actor, centrality in top_actors:
+        print(f"Actor: {actor}, Betweenness Centrality: {centrality}")
+
+
+def calculate_clustering_coefficient(graph, actor):
+    neighbors = graph.get_neighbors(actor)
+    num_neighbors = len(neighbors)
+
+    if num_neighbors < 2:
+        return 0.0
+
+    num_triangles = 0
+    num_possible_triangles = (num_neighbors * (num_neighbors - 1)) / 2
+
+    for i in range(num_neighbors - 1):
+        for j in range(i + 1, num_neighbors):
+            neighbor1 = neighbors[i]
+            neighbor2 = neighbors[j]
+
+            if graph.edge_exists(neighbor1, neighbor2):
+                num_triangles += 1
+
+    clustering_coefficient = (2 * num_triangles) / num_possible_triangles
+    return clustering_coefficient
+
+def find_actors_with_low_clustering_coefficient(graph, min_movies, max_clustering_coefficient):
+    actors = [actor for actor in graph.get_vertices() if len(graph.get_neighbors(actor)) >= min_movies]
+    low_clustering_actors = []
+
+    for actor in tqdm(actors):
+        clustering_coefficient = calculate_clustering_coefficient(graph, actor)
+        if clustering_coefficient < max_clustering_coefficient:
+            low_clustering_actors.append((actor, clustering_coefficient))
+
+    low_clustering_actors = sorted(low_clustering_actors, key=lambda x: x[1], reverse=False)
+    return low_clustering_actors
+
+def punto10():
+    actors_with_low_clustering = find_actors_with_low_clustering_coefficient(graph, min_movies=3, max_clustering_coefficient=0.5)
+
+    # Imprimo los 50 actores con mayor numero de pelis y menor coeficiente de clustering
+    c=0
+    for actor, clustering_coefficient in actors_with_low_clustering:
+        print(f"Actor: {actor}, Clustering Coefficient: {clustering_coefficient}")
+        c+=1
+        if c==50:
+            break
+
+def main():
+    # graph.print_graph()
+    punto1()
+    # punto4()
+    # punto5()
+    # punto6()
+    # punto7()
+    # punto9()
+    # punto10()
+
+main()

@@ -97,77 +97,92 @@ def grado_de_separacion(graph, actor1, actor2):
                 movies_with_neighbor.add(movie)
                 queue.append((neighbor, movies_with_neighbor))
 
-    # Actors are not connected
     return []
 
 def punto2():
     # actor1 = "nm0000138"  # Tom Hanks
-    # actor2 = "nm0000158"  # Robert De Niro
-    actor1 = "nm0000102" # Kevin Bacon
+    # actor2 = "nm0000102" # Kevin Bacon
+    actor1 = "nm0000158"  # Robert De Niro
     actor2 = "nm0004730" # Michael Fassbender 
     
     distancia = grado_de_separacion(graph, actor1, actor2)
+    print(distancia)
     print("Distancia entre", actor1, "y", actor2, ":", len(distancia))
 
-# punto2()
 
 def mayor_grado_separacion_componente_conexa(grafo, kevin_bacon):
     if not grafo.vertex_exists(kevin_bacon):
-        return None  # Kevin Bacon no existe en el grafo
+        return None  
     
     visitados = set()
     cola = deque([(kevin_bacon, 0)])  # Cola de tuplas (actor, distancia)
     mayor_grado_separacion = 0
-    
     while cola:
         actual, distancia = cola.popleft()
         
-        if distancia > mayor_grado_separacion:
-            mayor_grado_separacion = distancia
-        
+        if distancia >= mayor_grado_separacion:
+                mayor_grado_separacion = int(distancia/2) #Divido por 2 porque la distancia es entre actores y no peliculas
+                actor_mayor_separacion=grafo.get_neighbors(actual)
+
+
         if actual not in visitados:
             visitados.add(actual)
             adyacentes = grafo.get_neighbors(actual)
-            
             for adyacente in adyacentes:
-                cola.append((adyacente, distancia + 1))
+                cola.append((adyacente, distancia+1))
     
-    return mayor_grado_separacion
+    return actor_mayor_separacion,mayor_grado_separacion
 
 def punto3():
     actor="nm0000102" # Kevin Bacon
-    mayor_grado_separacion = mayor_grado_separacion_componente_conexa(graph, actor)
+    lista,mayor_grado_separacion = mayor_grado_separacion_componente_conexa(graph, actor)
     print("Mayor grado de separación de la componente conexa de", actor, ":", mayor_grado_separacion)
-
-# punto3()
+    print("Actor con mayor grado de separación de la componente conexa de", actor, ":", lista)
 
 #REVISAR
-def random_walks(graph, num_walks, walk_length):
-    vertex_counts = {vertex: 0 for vertex, data in graph._graph.items()}
+def random_walk_centrality(graph, num_walks, num_steps):
+    actor_counts = {}
+    movie_counts = {}
 
     for _ in tqdm(range(num_walks)):
         current_vertex = random.choice(list(graph._graph.keys()))
 
-        for _ in range(walk_length):
+        for _ in range(num_steps):
             neighbors = graph.get_neighbors(current_vertex)
-            if not neighbors:
+            if neighbors:
+                current_vertex = random.choice(neighbors)
+            else:
                 break
-            current_vertex = random.choice(neighbors)
-            vertex_counts[current_vertex] += 1
 
-    return vertex_counts
+            if graph.vertex_exists(current_vertex):
+                pal=str(current_vertex)
+                if pal[0]=='n':
+                    actor_counts[current_vertex] = actor_counts.get(current_vertex, 0) + 1
+                elif pal[0]=='t':
+                    movie_counts[current_vertex] = movie_counts.get(current_vertex, 0) + 1
+
+    actor_centrality = {actor: count / (num_walks * num_steps) for actor, count in actor_counts.items()}
+    movie_centrality = {movie: count / (num_walks * num_steps) for movie, count in movie_counts.items()}
+
+    top_actors = sorted(actor_centrality, key=actor_centrality.get, reverse=True)[:5]
+    top_movies = sorted(movie_centrality, key=movie_centrality.get, reverse=True)[:5]
+
+    return top_actors, top_movies
 
 def punto8():
     num_walks = 500
     walk_length = 10
 
-    vertex_counts = random_walks(graph, num_walks, walk_length)
+    top_actors, top_movies = random_walk_centrality(graph, num_walks, walk_length)
 
-    # Ordenar los vértices por su centralidad en orden descendente
-    sorted_vertices = sorted(vertex_counts.items(), key=lambda x: x[1], reverse=True)
+    print("Actores con mayor centralidad:", top_actors)
+    print("Películas con mayor centralidad:", top_movies)
 
-    # Imprimir los vértices con mayor centralidad
-    for vertex, count in sorted_vertices:
-        print("Vértice:", vertex, "Centralidad:", count)
 
-# punto8()
+def main():
+    # graph.print_graph()
+    punto2()
+    # punto3()
+    # punto8()
+
+main()
