@@ -204,7 +204,6 @@ bool test_put_NULL() {
 bool test_insert_random_sequence(size_t n, unsigned int seed, bool delete) {
   printf("========== %s (n=%lu, seed=%u, delete=%s) ==========\n",
          __PRETTY_FUNCTION__, n, seed, delete ? "true" : "false");
-  n=10;
   srand(seed);
   bool tests_result = true;
   dictionary_t *dict = dictionary_create(free);

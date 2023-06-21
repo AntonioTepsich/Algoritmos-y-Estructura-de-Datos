@@ -65,7 +65,9 @@ void* removerPrincipio(Lista* lista){
     size_t tam=lista->size;
     if(tam>0){
       Node* cabeza_vieja = lista->head;
+      
       lista->head=cabeza_vieja->next;
+
       void* valor=cabeza_vieja->value;
       free(cabeza_vieja->key);
       free(cabeza_vieja);
@@ -146,6 +148,50 @@ size_t hash_function(const char *key, size_t capacity) {
 };
 
 
+// dictionary_t* re_hash(dictionary_t* dictionary, size_t capacity) {
+//   Lista* nuevasListas = (Lista*)malloc(sizeof(Lista) * capacity);
+//   if (nuevasListas == NULL) {
+//     return NULL;
+//   }
+
+//   for (size_t i = 0; i < capacity; i++) {
+//     nuevasListas[i].head = NULL;
+//     nuevasListas[i].size = 0;
+//   }
+
+//   for (size_t i = 0; i < dictionary->capacity; i++) {
+//     Node* nodo = dictionary->listas[i].head;
+//     while (nodo != NULL) {
+//       size_t index = hash_function(nodo->key, capacity);
+//       Node* siguiente = nodo->next;
+//       nodo->next = nuevasListas[index].head;
+//       nuevasListas[index].head = nodo;
+//       nuevasListas[index].size++;
+
+//       nodo = siguiente;
+//     }
+//   }
+
+//   for (size_t i = 0; i < dictionary->capacity; i++) {
+//     Node* nodo = dictionary->listas[i].head;
+//     while (nodo != NULL) {
+//       Node* siguiente = nodo->next;
+//       free(nodo->key);
+//       if (dictionary->destroy != NULL) {
+//         dictionary->destroy(nodo->value);
+//       }
+//       free(nodo);
+//       nodo = siguiente;
+//     }
+//   }
+
+//   free(dictionary->listas);
+//   dictionary->listas = nuevasListas;
+//   dictionary->capacity = capacity;
+
+//   return dictionary;
+// };
+
 dictionary_t* re_hash(dictionary_t* dictionary, size_t capacity) {
   Lista* nuevasListas = (Lista*)malloc(sizeof(Lista) * capacity);
   if (nuevasListas == NULL) {
@@ -157,28 +203,20 @@ dictionary_t* re_hash(dictionary_t* dictionary, size_t capacity) {
     nuevasListas[i].size = 0;
   }
 
-  for (size_t i = 0; i < dictionary->capacity; i++) {
+  for (size_t i = 0; i < dictionary->capacity; i++){
     Node* nodo = dictionary->listas[i].head;
-    while (nodo != NULL) {
-      size_t index = hash_function(nodo->key, capacity);
+    while (nodo){
       Node* siguiente = nodo->next;
-      nodo->next = nuevasListas[index].head;
+      size_t index = hash_function(nodo->key, capacity);
+      if(!nuevasListas[index].head){
+        nodo->next = NULL;
+      }
+      else{
+        nodo->next = nuevasListas[index].head;
+      }
       nuevasListas[index].head = nodo;
       nuevasListas[index].size++;
 
-      nodo = siguiente;
-    }
-  }
-
-  for (size_t i = 0; i < dictionary->capacity; i++) {
-    Node* nodo = dictionary->listas[i].head;
-    while (nodo != NULL) {
-      Node* siguiente = nodo->next;
-      free(nodo->key);
-      if (dictionary->destroy != NULL) {
-        dictionary->destroy(nodo->value);
-      }
-      free(nodo);
       nodo = siguiente;
     }
   }
@@ -188,7 +226,7 @@ dictionary_t* re_hash(dictionary_t* dictionary, size_t capacity) {
   dictionary->capacity = capacity;
 
   return dictionary;
-};
+}
 
 
 bool dictionary_put(dictionary_t *dictionary, const char *key, void *value) {
